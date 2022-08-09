@@ -16,7 +16,7 @@
   --clr-background: #06070a;
 }
 
-html {
+html { 
   scroll-behavior: smooth;
   font-family: var(--font-family);
   background: var(--clr-background);
