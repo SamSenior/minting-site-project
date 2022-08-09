@@ -11,7 +11,7 @@ export default function Home() {
       </Head>
 
       <main className="bg-red-700">
-        <h1>
+        <h1 className="font-kaushan">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
       </main>
