@@ -1,8 +1,41 @@
-
-
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import { initOnboard } from "../utils/onboard";
 
 export default function MINT() {
+  const [onboard, setOnboard] = useState(null);
+
+  useEffect(() => {
+    const onboardData = initOnboard({
+      address: (address) => setWalletAddress(address ? address : ""),
+      wallet: (wallet) => {
+        if (wallet.provider) {
+          window.localStorage.setItem("selectedWallet", wallet.name);
+        } else {
+          window.localStorage.removeItem("selectedWallet");
+        }
+      },
+    });
+
+    setOnboard(onboardData);
+  }, []);
+
+  const previouslySelectedWallet = typeof window 	!== 'undefined' &&
+  window.localStorage.getItem(selectedWallet)
+
+  useEffect(() => {
+    if (previouslySelectedWallet 	!== null && onboard) {
+      onboard.walletSelect(previouslySelectedWallet)
+    }
+  }, [onboard, previouslySelectedWallet])
+
+  const connectWalletHandler = async () => {
+    const walletSelected = await onboard.walletSelect();
+    if (walletSelected) {
+      await onboard.walletCheck();
+      window.location.reload(true);
+    }
+  };
+
   return (
     <div className="min-h-screen h-full w-full overflow-hidden flex flex-col items-center justify-center bg-brand-background">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
@@ -17,7 +50,7 @@ export default function MINT() {
               Pre-Sale
             </h1>
             <h3 className="text-sm text-pink-200 tracking-widest">
-              0x52afbd46ECf1444a73C03b9c296E25c558291F1B
+             {walletAddress ? walletAddress.slice(0,8) + walletAdress.slice(-4) : '' }
             </h3>
 
             <div className="flex flex-col md:flex-row md:space-x-14 w-full mt-10 md:mt-14">
@@ -90,9 +123,26 @@ export default function MINT() {
                 </div>
 
                 {/* Mint Button && Connect Wallet Button */}
-                <button className="font-kaushan mt-12 w-full bg-gradient-to-br from-brand-purple to-brand-pink shadow-lg px-6 py-3 rounded-md text-2xl text-white hover:shadow-pink-400/50 mx-4 tracking-wide uppercase">
-                  Connect Wallet
-                </button>
+                {wallet ? (
+                  <button
+                    className={` ${
+                      paused || isMinting
+                        ? 'bg-gray-900 cursor-not-allowed'
+                        : 'bg-gradient-to-br from-brand-purple to-brand-pink shadow-lg hover:shadow-pink-400/50'
+                    } font-coiny mt-12 w-full px-6 py-3 rounded-md text-2xl text-white  mx-4 tracking-wide uppercase`}
+                    disabled={paused || isMinting}
+                    onClick={isPreSale ? presaleMintHandler : publicMintHandler}
+                  >
+                    {isMinting ? 'Minting...' : 'Mint'}
+                  </button>
+                ) : (
+                  <button
+                    className="font-coiny mt-12 w-full bg-gradient-to-br from-brand-purple to-brand-pink shadow-lg px-6 py-3 rounded-md text-2xl text-white hover:shadow-pink-400/50 mx-4 tracking-wide uppercase"
+                    onClick={() => connect()}
+                  >
+                    Connect Wallet
+                  </button>
+                )}
               </div>
             </div>
             {/* status */}
