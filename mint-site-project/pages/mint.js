@@ -34,6 +34,39 @@ export default function MINT() {
   }, []);
 
   useEffect(() => {
+    if (!connectedWallets.length) return;
+
+    const connectedWalletsLabelArray = connectedWallets.map(
+      ({ label }) => label
+    );
+    window.localStorage.setItem(
+      "connectedWallets",
+      JSON.stringify(connectedWalletsLabelArray)
+    );
+  }, [connectedWallets]);
+
+  useEffect(() => {
+    if (!onboard) return;
+
+    const previouslyConnectedWallets = JSON.parse(
+      window.localStorage.getItem("connectedWallets")
+    );
+
+    if (previouslyConnectedWallets?.length) {
+      async function setWalletFromLocalStorage() {
+        await connect({
+          autoSelect: {
+            label: previouslyConnectedWallets[0],
+            disableModals: true,
+          },
+        });
+      }
+
+      setWalletFromLocalStorage();
+    }
+  }, [onboard, connect]);
+
+  useEffect(() => {
     const init = async () => {
       setMaxSupply(await getMaxSupply());
       setTotalMinted(await getTotalMinted());
@@ -98,6 +131,18 @@ export default function MINT() {
 
         <div className="flex flex-col items-center justify-center h-full w-full px-2 md:px-10">
           <div className="relative z-1 md:max-w-2xl w-full bg-gray-900/90 filter backdrop-blur-sm py-4 rounded-md px-2 md:px-10 flex flex-col items-center">
+            {wallet && (
+              <button
+                className="absolute right-4 bg-indigo-600 transition duration-200 ease-in-out font-chalk border-2 border-[rgba(0,0,0,1)] shadow-[0px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none px-4 py-2 rounded-md text-sm text-white tracking-wide uppercase"
+                onClick={() =>
+                  disconnect({
+                    label: wallet.label,
+                  })
+                }
+              >
+                Disconnect
+              </button>
+            )}
             <h1 className="font-kaushan uppercase font-bold text-3xl md:text-4xl bg-gradient-to-br  from-brand-green to-brand-blue bg-clip-text text-transparent mt-3">
               {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale"}
             </h1>
