@@ -7,12 +7,12 @@ const config = {
   price: 0.01,
 };
 
-const onboardOptions = {
-  dappID: process.env.NEXT_PUBLIC_DAPP_ID,
-  networkId: 4, //rinkeby
-  walletSelect: {
-    wallets: [],
-  },
-};
+// const onboardOptions = {
+//   dappID: process.env.NEXT_PUBLIC_DAPP_ID,
+//   networkId: 4, //rinkeby
+//   walletSelect: {
+//     wallets: [],
+//   },
+// };
 
 export { config }; 

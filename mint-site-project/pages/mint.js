@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { initOnboard } from "../utils/onboard";
+import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 import { config } from "../dapp.config";
 import {
   getTotalMinted,
@@ -12,15 +13,25 @@ import {
 } from "../utils/interact";
 
 export default function MINT() {
+  const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
+  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain();
+  const connectedWallets = useWallets();
+
   const [maxSupply, setMaxSupply] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
   const [maxMintAmount, setMaxMintAmount] = useState(0);
   const [onboard, setOnboard] = useState(null);
   const [mintAmount, setMintAmount] = useState(1);
   const [paused, setPaused] = useState(false);
+
   const [isPublicSale, setIsPublicSale] = useState(false);
   const [isPreSale, setIsPreSale] = useState(false);
   const [status, setStatus] = useState(null);
+  const [isMinting, setIsMinting] = useState(false);
+
+  useEffect(() => {
+    setOnboard(initOnboard);
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -40,38 +51,6 @@ export default function MINT() {
     init();
   }, []);
 
-  useEffect(() => {
-    const onboardData = initOnboard({
-      address: (address) => setWalletAddress(address ? address : ""),
-      wallet: (wallet) => {
-        if (wallet.provider) {
-          window.localStorage.setItem("selectedWallet", wallet.name);
-        } else {
-          window.localStorage.removeItem("selectedWallet");
-        }
-      },
-    });
-
-    setOnboard(onboardData);
-  }, []);
-
-  const previouslySelectedWallet =
-    typeof window !== "undefined" &&
-    window.localStorage.getItem(selectedWallet);
-
-  useEffect(() => {
-    if (previouslySelectedWallet !== null && onboard) {
-      onboard.walletSelect(previouslySelectedWallet);
-    }
-  }, [onboard, previouslySelectedWallet]);
-
-  const connectWalletHandler = async () => {
-    const walletSelected = await onboard.walletSelect();
-    if (walletSelected) {
-      await onboard.walletCheck();
-      window.location.reload(true);
-    }
-  };
   const incrementMintAmount = () => {
     if (mintAmount < maxMintAmount) {
       setMintAmount(mintAmount + 1);
@@ -82,6 +61,31 @@ export default function MINT() {
     if (mintAmount > 1) {
       setMintAmount(mintAmount - 1);
     }
+  };
+
+  const presaleMintHandler = async () => {
+    setIsMinting(true);
+
+    const { success, status } = await presaleMint(mintAmount);
+
+    setStatus({
+      success,
+      message: status,
+    });
+
+    setIsMinting(false);
+  };
+  const publicMintHandler = async () => {
+    setIsMinting(true);
+
+    const { success, status } = await publicMint(mintAmount);
+
+    setStatus({
+      success,
+      message: status,
+    });
+
+    setIsMinting(false);
   };
 
   return (
@@ -98,8 +102,10 @@ export default function MINT() {
               {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale"}
             </h1>
             <h3 className="text-sm text-pink-200 tracking-widest">
-              {walletAddress
-                ? walletAddress.slice(0, 8) + walletAdress.slice(-4)
+              {wallet?.accounts[0]?.address
+                ? wallet?.accounts[0]?.address.slice(0, 8) +
+                  "..." +
+                  wallet?.accounts[0]?.address.slice(-4)
                 : ""}
             </h3>
 
@@ -232,7 +238,7 @@ export default function MINT() {
                 target="_blank"
                 className="text-gray-400 mt-4"
               >
-                <span className="break-all ...">1231222223123123123</span>
+                <span className="break-all ...">{config.contractAddress}</span>
               </a>
             </div>
           </div>
