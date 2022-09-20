@@ -1,7 +1,7 @@
 const config = {
   title: "Complacent Monkey Dapp",
   description: "A practise run dapp",
-  contractAddress: "0x52afbd46ECf1444a73C03b9c296E25c558291F1B",
+  contractAddress: "0xCCEaF957330A2b9E445155123512cebfC2C9375a",
   maxMintAmount: 10,
   presaleMaxMintAmount: 3,
   price: 0.01,
@@ -15,4 +15,4 @@ const onboardOptions = {
   },
 };
 
-export { config };
+export { config }; 

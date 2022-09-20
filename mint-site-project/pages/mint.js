@@ -1,8 +1,44 @@
 import { useState, useEffect } from "react";
 import { initOnboard } from "../utils/onboard";
+import { config } from "../dapp.config";
+import {
+  getTotalMinted,
+  getMaxSupply,
+  isPausedState,
+  isPublicSaleState,
+  isPreSaleState,
+  presaleMint,
+  publicMint,
+} from "../utils/interact";
 
 export default function MINT() {
+  const [maxSupply, setMaxSupply] = useState(0);
+  const [totalMinted, setTotalMinted] = useState(0);
+  const [maxMintAmount, setMaxMintAmount] = useState(0);
   const [onboard, setOnboard] = useState(null);
+  const [mintAmount, setMintAmount] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const [isPublicSale, setIsPublicSale] = useState(false);
+  const [isPreSale, setIsPreSale] = useState(false);
+  const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    const init = async () => {
+      setMaxSupply(await getMaxSupply());
+      setTotalMinted(await getTotalMinted());
+
+      setPaused(await isPausedState());
+      setIsPublicSale(await isPublicSaleState());
+      const isPreSale = await isPreSaleState();
+      setIsPreSale(isPreSale);
+
+      setMaxMintAmount(
+        isPreSale ? config.presaleMaxMintAmount : config.maxMintAmount
+      );
+    };
+
+    init();
+  }, []);
 
   useEffect(() => {
     const onboardData = initOnboard({
@@ -19,20 +55,32 @@ export default function MINT() {
     setOnboard(onboardData);
   }, []);
 
-  const previouslySelectedWallet = typeof window 	!== 'undefined' &&
-  window.localStorage.getItem(selectedWallet)
+  const previouslySelectedWallet =
+    typeof window !== "undefined" &&
+    window.localStorage.getItem(selectedWallet);
 
   useEffect(() => {
-    if (previouslySelectedWallet 	!== null && onboard) {
-      onboard.walletSelect(previouslySelectedWallet)
+    if (previouslySelectedWallet !== null && onboard) {
+      onboard.walletSelect(previouslySelectedWallet);
     }
-  }, [onboard, previouslySelectedWallet])
+  }, [onboard, previouslySelectedWallet]);
 
   const connectWalletHandler = async () => {
     const walletSelected = await onboard.walletSelect();
     if (walletSelected) {
       await onboard.walletCheck();
       window.location.reload(true);
+    }
+  };
+  const incrementMintAmount = () => {
+    if (mintAmount < maxMintAmount) {
+      setMintAmount(mintAmount + 1);
+    }
+  };
+
+  const decrementMintAmount = () => {
+    if (mintAmount > 1) {
+      setMintAmount(mintAmount - 1);
     }
   };
 
@@ -47,17 +95,20 @@ export default function MINT() {
         <div className="flex flex-col items-center justify-center h-full w-full px-2 md:px-10">
           <div className="relative z-1 md:max-w-2xl w-full bg-gray-900/90 filter backdrop-blur-sm py-4 rounded-md px-2 md:px-10 flex flex-col items-center">
             <h1 className="font-kaushan uppercase font-bold text-3xl md:text-4xl bg-gradient-to-br  from-brand-green to-brand-blue bg-clip-text text-transparent mt-3">
-              Pre-Sale
+              {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale"}
             </h1>
             <h3 className="text-sm text-pink-200 tracking-widest">
-             {walletAddress ? walletAddress.slice(0,8) + walletAdress.slice(-4) : '' }
+              {walletAddress
+                ? walletAddress.slice(0, 8) + walletAdress.slice(-4)
+                : ""}
             </h3>
 
             <div className="flex flex-col md:flex-row md:space-x-14 w-full mt-10 md:mt-14">
               <div className="relative w-full">
                 <div className="font-kaushan z-10 absolute top-2 left-2 opacity-80 filter backdrop-blur-lg text-base px-4 py-2 bg-black border border-brand-purple rounded-md flex items-center justify-center text-white font-semibold">
                   <p>
-                    <span className="text-brand-pink">0</span> / 1000
+                    <span className="text-brand-pink">{totalMinted}</span> /{""}{" "}
+                    {maxSupply}
                   </p>
                 </div>
 
@@ -70,7 +121,10 @@ export default function MINT() {
 
               <div className="flex flex-col items-center w-full px-4 mt-16 md:mt-0">
                 <div className="font-kaushan flex items-center justify-between w-full">
-                  <button className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md">
+                  <button
+                    className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md"
+                    onClick={incrementMintAmount}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-6 w-6 md:h-8 md:w-8"
@@ -87,10 +141,13 @@ export default function MINT() {
                     </svg>
                   </button>
                   <p className="flex items-center justify-center flex-1 grow text-center font-bold text-brand-pink text-3xl md:text-4xl">
-                    1
+                    {mintAmount}
                   </p>
 
-                  <button className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md">
+                  <button
+                    className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md"
+                    onClick={decrementMintAmount}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-6 w-6 md:h-8 md:w-8"
@@ -109,14 +166,19 @@ export default function MINT() {
                 </div>
 
                 <p className="text-sm text-pink-200 tracking-widest mt-3">
-                  Max Mint Amount: 5
+                  Max Mint Amount: {maxMintAmount}
                 </p>
                 <div className="border-t border-b py-4 mt-16 w-full">
                   <div className="w-full text-xl font-kaushan flex items-center justify-between text-brand-yellow">
                     <p>Total</p>
 
                     <div className="flex items-center space-x-3">
-                      <p>0.01 ETH</p>
+                      <p>
+                        {Number.parseFloat(config.price * mintAmount).toFixed(
+                          2
+                        )}{" "}
+                        ETH
+                      </p>{" "}
                       <span className="text-gray-400">+ GAS</span>
                     </div>
                   </div>
@@ -127,13 +189,13 @@ export default function MINT() {
                   <button
                     className={` ${
                       paused || isMinting
-                        ? 'bg-gray-900 cursor-not-allowed'
-                        : 'bg-gradient-to-br from-brand-purple to-brand-pink shadow-lg hover:shadow-pink-400/50'
+                        ? "bg-gray-900 cursor-not-allowed"
+                        : "bg-gradient-to-br from-brand-purple to-brand-pink shadow-lg hover:shadow-pink-400/50"
                     } font-coiny mt-12 w-full px-6 py-3 rounded-md text-2xl text-white  mx-4 tracking-wide uppercase`}
                     disabled={paused || isMinting}
                     onClick={isPreSale ? presaleMintHandler : publicMintHandler}
                   >
-                    {isMinting ? 'Minting...' : 'Mint'}
+                    {isMinting ? "Minting..." : "Mint"}
                   </button>
                 ) : (
                   <button
@@ -147,11 +209,17 @@ export default function MINT() {
             </div>
             {/* status */}
 
-            <div className="border border-brand-pink-400 rounded-md text-start h-full px-4 py-4 w-full mx-auto mt-8 md:mt-4">
-              <p className="flex flex-col space-y-2 text-white text-sm md:text-base break-words ...">
-                something went wrongskies
-              </p>
-            </div>
+            {status && (
+              <div
+                className={`border ${
+                  status.success ? "border-green-500" : "border-brand-pink-400 "
+                } rounded-md text-start h-full px-4 py-4 w-full mx-auto mt-8 md:mt-4"`}
+              >
+                <p className="flex flex-col space-y-2 text-white text-sm md:text-base break-words ...">
+                  {status.message}
+                </p>
+              </div>
+            )}
 
             {/* Contract Address */}
 
@@ -160,7 +228,7 @@ export default function MINT() {
                 Contract Address
               </h3>
               <a
-                href="https://rinkeby.etherscan.io/address/0x52afbd46ECf1444a73C03b9c296E25c558291F1B"
+                href={`https://rinkeby.etherscan.io/address/${config.contractAddress}#readContract`}
                 target="_blank"
                 className="text-gray-400 mt-4"
               >
