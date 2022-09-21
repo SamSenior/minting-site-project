@@ -280,7 +280,7 @@ export default function MINT() {
               </h3>
               <a
                 href={`https://rinkeby.etherscan.io/address/${config.contractAddress}#readContract`}
-                target="_blank"
+                // target="_blank"
                 className="text-gray-400 mt-4"
               >
                 <span className="break-all ...">{config.contractAddress}</span>
