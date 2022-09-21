@@ -1,1 +1,0 @@
-# minting-site-project
