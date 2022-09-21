@@ -144,7 +144,7 @@ export default function MINT() {
               </button>
             )}
             <h1 className="font-kaushan uppercase font-bold text-3xl md:text-4xl bg-gradient-to-br  from-brand-green to-brand-blue bg-clip-text text-transparent mt-3">
-              {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale"}
+              {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale "}
             </h1>
             <h3 className="text-sm text-pink-200 tracking-widest">
               {wallet?.accounts[0]?.address
@@ -280,7 +280,8 @@ export default function MINT() {
               </h3>
               <a
                 href={`https://rinkeby.etherscan.io/address/${config.contractAddress}#readContract`}
-                target="_blank"  rel="noreferrer" 
+                target="_blank"
+                rel="noreferrer"
                 className="text-gray-400 mt-4"
               >
                 <span className="break-all ...">{config.contractAddress}</span>
