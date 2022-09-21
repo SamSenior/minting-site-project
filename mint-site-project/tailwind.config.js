@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        bg_image: "url('../public/images/complacentmonkeyboathouse.jpeg')",
+      },
       fontFamily: {
         kaushan: ["Kaushan Script", ...defaultTheme.fontFamily.sans],
       },

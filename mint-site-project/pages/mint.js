@@ -129,7 +129,7 @@ export default function MINT() {
           className="animate-pulse-slow absolute inset-auto block w-full min-h-screen object-cover"
         />
 
-        <div className="flex flex-col items-center justify-center h-full w-full px-2 md:px-10">
+        <div className="flex flex-col items-center justify-center h-full w-full px-2  md:px-10">
           <div className="relative z-1 md:max-w-2xl w-full bg-gray-900/90 filter backdrop-blur-sm py-4 rounded-md px-2 md:px-10 flex flex-col items-center">
             {wallet && (
               <button
@@ -143,8 +143,8 @@ export default function MINT() {
                 Disconnect
               </button>
             )}
-            <h1 className="font-kaushan uppercase font-bold text-3xl md:text-4xl bg-gradient-to-br  from-brand-green to-brand-blue bg-clip-text text-transparent mt-3">
-              {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public Sale "}
+            <h1 className="font-kaushan uppercase font-bold  text-3xl md:text-4xl bg-gradient-to-br  from-brand-green to-brand-blue bg-clip-text text-transparent  mt-5">
+              {paused ? "Paused" : isPreSale ? "Pre-Sale" : "Public mint \xa0"}
             </h1>
             <h3 className="text-sm text-pink-200 tracking-widest">
               {wallet?.accounts[0]?.address
@@ -172,6 +172,28 @@ export default function MINT() {
 
               <div className="flex flex-col items-center w-full px-4 mt-16 md:mt-0">
                 <div className="font-kaushan flex items-center justify-between w-full">
+                <button
+                    className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md"
+                    onClick={decrementMintAmount}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 md:h-8 md:w-8"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18 12H6"
+                      />
+                    </svg>
+                  </button>
+                  <p className="flex items-center justify-center flex-1 grow text-center font-bold text-brand-pink text-3xl md:text-4xl">
+                    {mintAmount}
+                  </p>
                   <button
                     className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md"
                     onClick={incrementMintAmount}
@@ -191,29 +213,7 @@ export default function MINT() {
                       />
                     </svg>
                   </button>
-                  <p className="flex items-center justify-center flex-1 grow text-center font-bold text-brand-pink text-3xl md:text-4xl">
-                    {mintAmount}
-                  </p>
-
-                  <button
-                    className="w-14 h-10 md:w-16 md:h-12 flex items-center justify-center text-brand-background hover:shadow-lg bg-gray-300 font-bold rounded-md"
-                    onClick={decrementMintAmount}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 md:h-8 md:w-8"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M18 12H6"
-                      />
-                    </svg>
-                  </button>
+                  
                 </div>
 
                 <p className="text-sm text-pink-200 tracking-widest mt-3">
