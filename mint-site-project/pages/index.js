@@ -112,7 +112,7 @@ export default function Home() {
               className="w-64 h-64 rounded-md object-cover"
             />
 
-            <div className="flex flex-col md:items-start items-center justify-center text-center font-kaushan text-gray-800 px-4 md:px-0 py-10 mt-14">
+            <div className="flex flex-col md:items-start items-center justify-center text-center font-kaushan text-purple-800 px-4 md:px-0 py-10 mt-14">
               <h2 className="font-bold text-2xl md:text-4xl uppercase">
                 About Complacent Monkeys
               </h2>
